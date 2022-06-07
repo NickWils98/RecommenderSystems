@@ -192,12 +192,15 @@ def test_recommendations(rules_df, top10_list, recommend_df):
     :param top10_list: list of baseline
     :param recommend_df: pandas dataframe with previous user interactions
     """
+    # key for splitting the data completely
+    recommend_df["Key"] = recommend_df.product_id.astype("string") + "_" + recommend_df.user_id.astype("string")
+
     # split the data by solutions which are the purchased items and past_data which are the other events
     past_data = recommend_df[recommend_df["event_type"].isin(["view", "cart"])]
     solutions = recommend_df[recommend_df["event_type"] == "purchase"]
 
-    # split the data completely: If A is purchased in solutions than it can't be viewed in past_data
-    # past_data = past_data[~((past_data.user_id.isin(solutions.user_id)) & (past_data.product_id.isin(solutions.product_id)))]
+    # uncomment to split the data completely: If A is purchased in solutions than it can't be viewed in past_data by that user
+    # past_data = past_data[~(past_data.Key.isin(solutions.Key))]
 
     # make the recommendations with the past_data
     recommendation_df = recommendations(rules_df, top10_list, past_data, False)
